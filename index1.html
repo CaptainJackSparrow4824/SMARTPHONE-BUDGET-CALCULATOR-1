@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📱 Smartphone Budget Calculator (2025)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+    }
+    label {
+      display: block;
+      margin: 12px 0 4px;
+    }
+    input, select {
+      padding: 8px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #0077cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📱 Smartphone Budget Calculator (2025 Edition)</h1>
+
+  <label>Age:</label>
+  <input type="number" id="age" />
+
+  <label>Monthly Income (₹):</label>
+  <input type="number" id="income" />
+
+  <label>All EMIs + Home Rent (₹):</label>
+  <input type="number" id="emi" />
+
+  <label>Expected Usage (in years):</label>
+  <input type="number" id="usage" value="3"/>
+
+  <label>User Type:</label>
+  <select id="userType">
+    <option value="low">Low</option>
+    <option value="moderate" selected>Moderate</option>
+    <option value="power">Power</option>
+  </select>
+
+  <label>Brand Preference:</label>
+  <select id="branded">
+    <option value="yes" selected>Yes</option>
+    <option value="no">No</option>
+  </select>
+
+  <label>Old Phone Resale Value (₹):</label>
+  <input type="number" id="resale" value="0"/>
+
+  <label>Number of Parents You're Financially Supporting:</label>
+  <input type="number" id="parents" value="0" />
+
+  <label>Do You Have a Dependent Spouse?</label>
+  <select id="spouse">
+    <option value="yes">Yes</option>
+    <option value="no" selected>No</option>
+  </select>
+
+  <label>Number of Kids:</label>
+  <input type="number" id="kids" value="0"/>
+
+  <button onclick="calculate()">Calculate Budget</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    function getAgeMultiplier(age) {
+      if (age <= 22) return 0.75;
+      if (age <= 26) return 1.0;
+      if (age <= 35) return 1.3;
+      if (age <= 45) return 1.1;
+      if (age <= 60) return 0.9;
+      return 0.7;
+    }
+
+    function getUserTypeMultiplier(type) {
+      if (type === "low") return 0.8;
+      if (type === "moderate") return 1.0;
+      return 1.2;
+    }
+
+    function getBrandMultiplier(choice) {
+      return choice === "yes" ? 1.2 : 1.0;
+    }
+
+    function getResponsibilityMultiplier(parents, spouse, kids) {
+      let p = parents == 0 ? 1.0 : parents == 1 ? 0.9 : 0.8;
+      let s = spouse === "yes" ? 0.9 : 1.0;
+      let k = kids == 0 ? 1.0 : kids == 1 ? 0.8 : 0.65;
+      return p * s * k;
+    }
+
+    function calculate() {
+      const age = parseInt(document.getElementById('age').value);
+      const income = parseFloat(document.getElementById('income').value);
+      const emi = parseFloat(document.getElementById('emi').value);
+      const usage = parseFloat(document.getElementById('usage').value);
+      const userType = document.getElementById('userType').value;
+      const branded = document.getElementById('branded').value;
+      const resale = parseFloat(document.getElementById('resale').value);
+      const parents = parseInt(document.getElementById('parents').value);
+      const spouse = document.getElementById('spouse').value;
+      const kids = parseInt(document.getElementById('kids').value);
+
+      const adjustedIncome = income - emi;
+      const base = adjustedIncome * 12 * 0.03;
+
+      const usageMultiplier = usage / 3;
+      const ageMultiplier = getAgeMultiplier(age);
+      const userTypeMultiplier = getUserTypeMultiplier(userType);
+      const brandMultiplier = getBrandMultiplier(branded);
+      const responsibilityMultiplier = getResponsibilityMultiplier(parents, spouse, kids);
+
+      const finalBudget = base * usageMultiplier * ageMultiplier * userTypeMultiplier * brandMultiplier * responsibilityMultiplier + resale;
+
+      document.getElementById('result').innerHTML = `
+        <strong>Recommended Smartphone Budget:</strong><br/>
+        ₹${finalBudget.toFixed(0)} (Based on your inputs)
+      `;
+    }
+  </script>
+</body>
+</html>
