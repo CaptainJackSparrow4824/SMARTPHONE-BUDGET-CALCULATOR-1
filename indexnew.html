@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📱 Smartphone Budget Calculator (2025)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #ffffff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      max-width: 700px;
+      width: 90%;
+      margin: 40px auto;
+      padding: 30px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0077cc;
+      margin-bottom: 24px;
+    }
+
+    label {
+      font-weight: 500;
+      margin-top: 12px;
+      display: block;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #0077cc;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #e1f5fe;
+      border-left: 6px solid #0288d1;
+      border-radius: 8px;
+      font-size: 18px;
+      color: #01497c;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📱 Smartphone Budget Calculator (2025)</h1>
+
+    <label for="age">Age:</label>
+    <input type="number" id="age" placeholder="e.g. 30" />
+
+    <label for="income">Monthly Income (₹):</label>
+    <input type="number" id="income" placeholder="Your monthly income" />
+
+    <label for="emi">All EMIs + Home Rent (₹):</label>
+    <input type="number" id="emi" placeholder="Total monthly EMIs + Rent" />
+
+    <label for="usage">Expected Usage (in years):</label>
+    <input type="number" id="usage" value="3" />
+
+    <label for="userType">User Type:</label>
+    <select id="userType">
+      <option value="low">Low</option>
+      <option value="moderate" selected>Moderate</option>
+      <option value="power">Power</option>
+    </select>
+
+    <label for="branded">Brand Preference:</label>
+    <select id="branded">
+      <option value="yes" selected>Yes</option>
+      <option value="no">No</option>
+    </select>
+
+    <label for="resale">Old Phone Resale Value (₹):</label>
+    <input type="number" id="resale" value="0" />
+
+    <label for="parents">Number of Parents You're Supporting:</label>
+    <input type="number" id="parents" value="0" />
+
+    <label for="spouse">Do You Have a Spouse?</label>
+    <select id="spouse">
+      <option value="yes">Yes</option>
+      <option value="no" selected>No</option>
+    </select>
+
+    <label for="kids">Number of Kids:</label>
+    <input type="number" id="kids" value="0" />
+
+    <button onclick="calculate()">🎯 Calculate My Ideal Budget</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function getAgeMultiplier(age) {
+      if (age <= 22) return 0.75;
+      if (age <= 26) return 1.0;
+      if (age <= 35) return 1.3;
+      if (age <= 45) return 1.1;
+      if (age <= 60) return 0.9;
+      return 0.7;
+    }
+
+    function getUserTypeMultiplier(type) {
+      if (type === "low") return 0.8;
+      if (type === "moderate") return 1.0;
+      return 1.2;
+    }
+
+    function getBrandMultiplier(choice) {
+      return choice === "yes" ? 1.2 : 1.0;
+    }
+
+    function getResponsibilityMultiplier(parents, spouse, kids) {
+      let p = parents === 0 ? 1.0 : parents === 1 ? 0.9 : 0.8;
+      let s = spouse === "yes" ? 0.9 : 1.0;
+      let k = kids === 0 ? 1.0 : kids === 1 ? 0.8 : 0.65;
+      return p * s * k;
+    }
+
+    function calculate() {
+      const age = parseInt(document.getElementById('age').value);
+      const income = parseFloat(document.getElementById('income').value);
+      const emi = parseFloat(document.getElementById('emi').value);
+      const usage = parseFloat(document.getElementById('usage').value);
+      const userType = document.getElementById('userType').value;
+      const branded = document.getElementById('branded').value;
+      const resale = parseFloat(document.getElementById('resale').value);
+      const parents = parseInt(document.getElementById('parents').value);
+      const spouse = document.getElementById('spouse').value;
+      const kids = parseInt(document.getElementById('kids').value);
+
+      const adjustedIncome = income - emi;
+      const base = adjustedIncome * 12 * 0.03;
+
+      const usageMultiplier = usage / 3;
+      const ageMultiplier = getAgeMultiplier(age);
+      const userTypeMultiplier = getUserTypeMultiplier(userType);
+      const brandMultiplier = getBrandMultiplier(branded);
+      const responsibilityMultiplier = getResponsibilityMultiplier(parents, spouse, kids);
+
+      const finalBudget = base * usageMultiplier * ageMultiplier * userTypeMultiplier * brandMultiplier * responsibilityMultiplier + resale;
+
+      document.getElementById('result').innerHTML = `
+        <strong>💡 Recommended Smartphone Budget:</strong><br/><br/>
+        <span style="font-size: 24px; font-weight: bold;">₹${finalBudget.toFixed(0)}</span><br/><br/>
+        <small>Based on your financial profile and lifestyle choices</small>
+      `;
+    }
+  </script>
+</body>
+</html>
